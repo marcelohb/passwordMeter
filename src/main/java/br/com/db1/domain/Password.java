@@ -8,7 +8,7 @@ public class Password {
 	private String symbols = ")!@#$%^&*()";
 	
 	public Password(String text) {
-		this.score = 0;
+		this.score = 50;
 		this.complexity = Complexity.TOO_SHORT;
 		this.text = text;
 		validade();

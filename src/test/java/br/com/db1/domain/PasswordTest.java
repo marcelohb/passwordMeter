@@ -7,6 +7,14 @@ import org.junit.Test;
 public class PasswordTest {
 	
 	String text;
+	
+	@Test
+	public void first() {
+		text = "lind1202FEV$";
+		Password pass = new Password(text);
+		assertEquals(100, pass.getScore());
+		assertEquals("Too Short", pass.getComplexity());
+	}
 
 	@Test
 	public void lengthZero() {
@@ -226,6 +234,6 @@ public class PasswordTest {
 		text = "!s1@cb#0";
 		Password pass = new Password(text);
 		assertEquals(0, pass.sequentialSymbols());
-	}
+	}	
 
 }
