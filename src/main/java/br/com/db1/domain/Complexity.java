@@ -7,7 +7,7 @@ public enum Complexity {
 	WEAK("Weak"),
 	GOOD("Good"),
 	STRONG("Strong"),
-	VERY_STRONG("Very Stron");
+	VERY_STRONG("Very Strong");
 	
 	private String value;
 	

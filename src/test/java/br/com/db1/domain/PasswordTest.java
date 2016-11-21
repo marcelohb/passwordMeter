@@ -10,10 +10,103 @@ public class PasswordTest {
 	
 	@Test
 	public void first() {
-		text = "lind1202FEV$";
+		text = "$";
 		Password pass = new Password(text);
-		assertEquals(100, pass.getScore());
-		assertEquals("Too Short", pass.getComplexity());
+		assertEquals(4, pass.numberOfCaracters());
+		assertEquals(0, pass.upperCaseLetters());
+		assertEquals(0, pass.lowerCaseLetters());
+		assertEquals(0, pass.numbers());
+		assertEquals(6, pass.symbols());
+		assertEquals(0, pass.middleNumbersOrSymbols());
+		assertEquals(0, pass.requirements());
+		assertEquals(0, pass.lettersOnly());
+		assertEquals(0, pass.numbersOnly());
+		assertEquals(0, pass.consecutiveUppercase());
+		assertEquals(0, pass.consecutiveLowercase());
+		assertEquals(0, pass.consecutiveNumbers());
+		assertEquals(0, pass.sequentialLetters());
+		assertEquals(0, pass.sequentialNumbers());
+		assertEquals(0, pass.sequentialSymbols());
+		assertEquals(10, pass.getScore());
+		assertEquals(Complexity.VERY_WEAK.value(), pass.getComplexity());
+	}
+	
+	@Test
+	public void complexityTooShort() {
+		text = "";
+		Password pass = new Password(text);
+		assertEquals(0, pass.getScore());
+		assertEquals(Complexity.TOO_SHORT.value(), pass.getComplexity());
+	}
+	
+	@Test
+	public void complexityVeryWeak() {
+		text = "2";
+		Password pass = new Password(text);
+		assertEquals(Complexity.VERY_WEAK.value(), pass.getComplexity());
+	}
+	
+	@Test
+	public void complexityWeak() {
+		text = "2cA";
+		Password pass = new Password(text);
+		assertEquals(12, pass.numberOfCaracters());
+		assertEquals(4, pass.upperCaseLetters());
+		assertEquals(4, pass.lowerCaseLetters());
+		assertEquals(0, pass.lettersOnly());
+		assertEquals(4, pass.numbers());
+		assertEquals(24, pass.getScore());
+		assertEquals(Complexity.WEAK.value(), pass.getComplexity());
+	}
+	
+	@Test
+	public void complexityGood() {
+		text = "2cAmmm0";
+		Password pass = new Password(text);
+		assertEquals(28, pass.numberOfCaracters());
+		assertEquals(12, pass.upperCaseLetters());
+		assertEquals(6, pass.lowerCaseLetters());
+		assertEquals(8, pass.numbers());
+		assertEquals(-4, pass.consecutiveLowercase());
+		assertEquals(-4, pass.repeatCharacters());
+		assertEquals(46, pass.getScore());
+		assertEquals(Complexity.GOOD.value(), pass.getComplexity());
+	}
+	
+	@Test
+	public void complexityStrong() {
+		text = "meuName12";
+		Password pass = new Password(text);
+		assertEquals(36, pass.numberOfCaracters());
+		assertEquals(16, pass.upperCaseLetters());
+		assertEquals(6, pass.lowerCaseLetters());
+		assertEquals(8, pass.numbers());
+		assertEquals(0, pass.symbols());
+		assertEquals(2, pass.middleNumbersOrSymbols());
+		assertEquals(8, pass.requirements());
+		assertEquals(-1, pass.repeatCharacters());
+		assertEquals(-8, pass.consecutiveLowercase());
+		assertEquals(-2, pass.consecutiveNumbers());
+		assertEquals(65, pass.getScore());
+		assertEquals(Complexity.STRONG.value(), pass.getComplexity());
+	}
+	
+	@Test
+	public void complexityVeryStrong() {
+		text = "meuName12$";
+		Password pass = new Password(text);
+		assertEquals(40, pass.numberOfCaracters());
+		assertEquals(18, pass.upperCaseLetters());
+		assertEquals(8, pass.lowerCaseLetters());
+		assertEquals(8, pass.numbers());
+		assertEquals(6, pass.symbols());
+		assertEquals(4, pass.middleNumbersOrSymbols());
+		assertEquals(10, pass.requirements());
+		assertEquals(-1, pass.repeatCharacters());
+		assertEquals(-8, pass.consecutiveLowercase());
+		assertEquals(-2, pass.consecutiveNumbers());
+		assertEquals(83, pass.getScore());
+		assertEquals(Complexity.VERY_STRONG.value(), pass.getComplexity());
 	}
 
 	@Test
@@ -21,7 +114,7 @@ public class PasswordTest {
 		text = "";
 		Password pass = new Password(text);
 		assertEquals(0, pass.getScore());
-		assertEquals(Complexity.TOO_SHORT, pass.getComplexity());
+		assertEquals(Complexity.TOO_SHORT.value(), pass.getComplexity());
 	}
 	
 	@Test
@@ -150,7 +243,19 @@ public class PasswordTest {
 		assertEquals(0, pass.numbersOnly());
 	}
 	
-	// TODO Repeate Chars
+	@Test
+	public void repeatCharacters() {
+		text = "1m1m$$";
+		Password pass = new Password(text);
+		assertEquals(-15, pass.repeatCharacters());
+	}
+	
+	@Test
+	public void noRepeatCharacters() {
+		text = "12345";
+		Password pass = new Password(text);
+		assertEquals(0, pass.repeatCharacters());
+	}
 	
 	@Test
 	public void consecutiveUppercase() {

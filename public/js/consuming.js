@@ -1,16 +1,13 @@
 $(document).ready(function() {
-//    $.ajax({
-//        url: "http://localhost:8787/validade"
-//    }).then(function(data, status, jqxhr) {
-//       $('#score').append(data.score + "%");
-//       $('#complexity').append(data.complexity);
-//       console.log(jqxhr);
-//    });
-    consult();
+	$('#score').html("0%");
+	$('#complexity').html("Too Short");
+    $('#password').change(
+		function() {
+			consult();
+		});
 });
 
 function consult() {
-    console.log('addWine');
     $.ajax({
         type: 'POST',
         contentType: 'application/json',
@@ -18,11 +15,12 @@ function consult() {
         dataType: "json",
         data: $('#password').val(),
         success: function(data, textStatus, jqXHR){
-            $('#score').append(data.score + "%");
-			$('#complexity').append(data.complexity);
+            $('#score').html(data.score + "%");
+			$('#complexity').html(data.complexity);
         },
         error: function(jqXHR, textStatus, errorThrown){
-            alert('addWine error: ' + textStatus);
+        	$('#score').html("0%");
+        	$('#complexity').html("Too Short");
         }
     });
 }

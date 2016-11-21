@@ -8,7 +8,7 @@ public class Password {
 	private String symbols = ")!@#$%^&*()";
 	
 	public Password(String text) {
-		this.score = 50;
+		this.score = 0;
 		this.complexity = Complexity.TOO_SHORT;
 		this.text = text;
 		validade();
@@ -16,33 +16,62 @@ public class Password {
 
 	private void validade() {
 		// ADDITIONS
-		numberOfCaracters();
-		upperCaseLetters();
-		lowerCaseLetters();
-		numbers();
-		symbols();
-		middleNumbersOrSymbols();
-		requirements();
+		updateScore(numberOfCaracters());
+		updateScore(upperCaseLetters());
+		updateScore(lowerCaseLetters());
+		updateScore(numbers());
+		updateScore(symbols());
+		updateScore(middleNumbersOrSymbols());
+		updateScore(requirements());
 		// DEDUCTIONS
-		lettersOnly();
-		numbersOnly();
-		//repeatedChars();
-		consecutiveUppercase();
-		consecutiveLowercase();
-		consecutiveNumbers();
-		sequentialLetters();
-		sequentialNumbers();
-		sequentialSymbols();
+		updateScore(lettersOnly());
+		updateScore(numbersOnly());
+		updateScore(repeatCharacters());
+		updateScore(consecutiveUppercase());
+		updateScore(consecutiveLowercase());
+		updateScore(consecutiveNumbers());
+		updateScore(sequentialLetters());
+		updateScore(sequentialNumbers());
+		updateScore(sequentialSymbols());
+		// COMPLEXITY
+		complexity();
 	}
 
 	public int getScore() {
 		if (this.score > 100)
 			return 100;
-		return score;
+		return this.score;
 	}
 	
 	public String getComplexity() {
 		return complexity.value();
+	}
+	
+	public void setScore(int score) {
+		this.score = score;
+	}
+	
+	public void updateScore(int score) {
+		this.score += score;
+	}
+	
+	public void setComplexity(Complexity complexity) {
+		this.complexity = complexity;
+	}
+	
+	public void complexity() {
+		if (getScore() == 0)
+			setComplexity(Complexity.TOO_SHORT);
+		if (getScore() > 0 && getScore() < 20)
+			setComplexity(Complexity.VERY_WEAK);
+		if (getScore() >= 20 && getScore() < 40)
+			setComplexity(Complexity.WEAK);
+		if (getScore() >= 40 && getScore() < 60)
+			setComplexity(Complexity.GOOD);
+		if (getScore() >= 60 && getScore() < 80)
+			setComplexity(Complexity.STRONG);
+		if (getScore() >= 80)
+			setComplexity(Complexity.VERY_STRONG);
 	}
 	
 	public boolean minimunLength() {
@@ -53,7 +82,6 @@ public class Password {
 
 	public int numberOfCaracters() {
 		int bonus = text.length() * 4;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -67,7 +95,6 @@ public class Password {
 		if (uppers == 0)
 			return uppers;
 		int bonus = (text.length()-uppers)*2;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -81,7 +108,6 @@ public class Password {
 		if (lowers == 0)
 			return lowers;
 		int bonus = (text.length()-lowers)*2;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -93,7 +119,6 @@ public class Password {
 				numbers ++;
 		}
 		int bonus = numbers*4;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -105,7 +130,6 @@ public class Password {
 				symbols ++;
 		}
 		int bonus = symbols*6;
-		this.score += bonus;
 		return bonus;
 	}
 	
@@ -113,7 +137,8 @@ public class Password {
 		int mns = 0; 
 		if (text.length() == 0)
 			return 0;
-		// TODO refatorar para criar um método que buscar a expressao informada
+		if (text.length() < 2)
+			return 0;
 		char a[] = text.substring(1, text.length()-1).toCharArray();
 		for (char c : a) {
 			if (String.valueOf(c).matches("[^0-9^A-Z^a-z]"))
@@ -122,7 +147,6 @@ public class Password {
 				mns ++;
 		}
 		int bonus = mns * 2;
-		this.score += bonus; // TODO refatorar score para triar um metodo de atualizar
 		return bonus;
 	}
 
@@ -152,7 +176,6 @@ public class Password {
 		if (numbers() > 0 || symbols() > 0)
 			letters = 0;
 		int bonus = letters * -1;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -166,7 +189,32 @@ public class Password {
 		if (upperCaseLetters() > 0 || lowerCaseLetters() > 0 || symbols() > 0)
 			numbers = 0;
 		int bonus = numbers * -1;
-		this.score += bonus;
+		return bonus;
+	}
+
+	public int repeatCharacters() {
+		Double repeat = 0.0;
+		int qtdRepeat = 0;
+		int unique;
+		int lengthA = text.length(), lengthB = text.length();
+		int bonus = 0;
+		boolean existChar;
+		
+		for (int i=0; i < lengthA; i++) {
+			existChar = false;
+			for (int t=0; t < lengthB; t++) {
+				if (text.charAt(i) == text.charAt(t) && i != t) {
+					existChar = true;
+					repeat += Math.abs(lengthA/(t-i));
+				}
+			}
+			if (existChar) {
+				qtdRepeat ++;
+				unique = lengthA-qtdRepeat;
+				repeat = (unique > 0) ? Math.ceil(repeat/unique) : Math.ceil(repeat);
+			}
+		}
+		bonus = repeat.intValue() * -1; 
 		return bonus;
 	}
 
@@ -180,7 +228,6 @@ public class Password {
 			previous = c;
 		}
 		int bonus = (uppers*2) * -1;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -194,7 +241,6 @@ public class Password {
 			previous = c;
 		}
 		int bonus = (lowers*2) * -1;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -208,7 +254,6 @@ public class Password {
 			previous = c;
 		}
 		int bonus = (numbers*2) * -1;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -225,7 +270,6 @@ public class Password {
 			previous = c;
 		}
 		int bonus = (sequential*3) * -1;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -242,7 +286,6 @@ public class Password {
 			previous = c;
 		}
 		int bonus = (sequential*3) * -1;
-		this.score += bonus;
 		return bonus;
 	}
 
@@ -260,7 +303,6 @@ public class Password {
 		}
 		
 		int bonus = (sequential*3) * -1;
-		this.score += bonus;
 		return bonus;
 	}
 	
